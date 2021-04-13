@@ -1,3 +1,4 @@
 ./car_scraper
 .vscode
 .idea
+.env

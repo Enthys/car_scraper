@@ -1,11 +1,21 @@
 package models
 
-import "golang.org/x/crypto/bcrypt"
+import (
+	"car_scraper/database"
+
+	"golang.org/x/crypto/bcrypt"
+)
+
+func InitiateModels() {
+	database.DB.AutoMigrate(&User{})
+	database.DB.AutoMigrate(&Filter{})
+}
 
 type User struct {
-	ID       int8   `gorm:"primaryKey;autoincrement;not null"`
-	Email    string `gorm:"type:varchar(124);not null"`
-	Password string
+	ID       uint8    `gorm:"primaryKey;autoincrement;not null"`
+	Email    string   `gorm:"type:varchar(124);not null"`
+	Password string   `gorm:"type:text;not null"`
+	Filters  []Filter `gorm:"foreignKey:UserID"`
 }
 
 func (user *User) CheckPassword(password string) error {
@@ -15,4 +25,28 @@ func (user *User) CheckPassword(password string) error {
 	}
 
 	return nil
+}
+
+type UserRepository struct{}
+
+func (u UserRepository) GetUserByEmail(email string) User {
+	var user User
+	database.DB.Model(&User{}).First(&user, "email = ?", email)
+
+	return user
+}
+
+func (u UserRepository) GetUserById(id uint8) User {
+	var user User
+	database.DB.Model(&User{}).First(&user, "id = ?", id)
+
+	return user
+}
+
+type Filter struct {
+	ID     uint32 `gorm:"primaryKey:autoincrement;not null"`
+	UserID uint8  `gorm:"not null"`
+	User   User   `gorm:"foreignKey:UserID;not null"`
+	Type   string `gorm:"type:varchar(32);not null"`
+	Search string `gorm:"type:text;not null"`
 }

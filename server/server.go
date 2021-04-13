@@ -1,7 +1,9 @@
 package server
 
 import (
+	"car_scraper/auth"
 	"car_scraper/database"
+	"car_scraper/models"
 	authActions "car_scraper/server/authentication/routes"
 	filterActions "car_scraper/server/filter/routes"
 	userActions "car_scraper/server/user/routes"
@@ -11,7 +13,8 @@ import (
 
 func StartServer() {
 	database.ConnectToDatabase()
-	database.InitiateModels()
+	models.InitiateModels()
+	auth.InitAuth()
 
 	app := gin.Default()
 
@@ -23,9 +26,9 @@ func StartServer() {
 func setupRoutes(app *gin.Engine) {
 	filterRoutes := app.Group("/api/filters")
 	{
-		filterRoutes.GET("", filterActions.GetCarFilters)
-		filterRoutes.POST("", filterActions.CreateCarFilrer)
-		filterRoutes.DELETE("", filterActions.DeleteCarFilter)
+		filterRoutes.GET("", auth.AuthenticateUser(), filterActions.GetCarFilters)
+		filterRoutes.POST("", auth.AuthenticateUser(), filterActions.CreateCarFilrer)
+		filterRoutes.DELETE("", auth.AuthenticateUser(), filterActions.DeleteCarFilter)
 	}
 
 	autheRoutes := app.Group("/api/auth")
@@ -34,7 +37,7 @@ func setupRoutes(app *gin.Engine) {
 		autheRoutes.GET("logout", authActions.Logout)
 	}
 
-	userRoutes := app.Group("/api/user")
+	userRoutes := app.Group("/api/users")
 	{
 		userRoutes.POST("", userActions.RegisterUser)
 	}

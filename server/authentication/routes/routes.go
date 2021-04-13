@@ -1,17 +1,16 @@
 package routes
 
 import (
+	"car_scraper/auth"
 	"car_scraper/database"
 	"car_scraper/models"
-	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/bcrypt"
 )
 
 type LoginRequestJSON struct {
-	Email    string `json:"username" binding:"required"`
+	Email    string `json:"email" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
@@ -19,7 +18,10 @@ func Login(c *gin.Context) {
 	var requestData LoginRequestJSON
 
 	if err := c.ShouldBindJSON(&requestData); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+
 		return
 	}
 
@@ -27,11 +29,29 @@ func Login(c *gin.Context) {
 	database.DB.First(&user, "email = ?", requestData.Email)
 
 	if err := user.CheckPassword(requestData.Password); err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid Credentials"})
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "Invalid Credentials",
+		})
+
 		return
 	}
 
-	
+	jwtWrapper := auth.JwtWrapper{
+		SecretKey: "This is a secret Key",
+	}
+
+	token, err := jwtWrapper.GenerateToken(user.ID, user.Email)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"token": token,
+	})
 }
 
 func Logout(c *gin.Context) {
