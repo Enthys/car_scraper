@@ -4,23 +4,15 @@ import (
 	"crypto/rsa"
 	"io/ioutil"
 	"log"
-	"net/http"
 	"os"
 	"time"
 
-	jwt "github.com/dgrijalva/jwt-go"
-	"github.com/dgrijalva/jwt-go/request"
-	"github.com/gin-gonic/gin"
-)
-
-const (
-	UserId    = "UserId"
-	UserEmail = "Email"
+	"github.com/dgrijalva/jwt-go"
 )
 
 var (
-	verifyKey *rsa.PublicKey
-	signKey   *rsa.PrivateKey
+	VerifyKey *rsa.PublicKey
+	SignKey   *rsa.PrivateKey
 )
 
 type JwtWrapper struct {
@@ -40,7 +32,7 @@ func InitAuth() {
 		log.Fatalf("Failed to read %s", os.Getenv("AUTH_JWT_PRIVATE_KEY_PATH"))
 	}
 
-	signKey, err = jwt.ParseRSAPrivateKeyFromPEM(signBytes)
+	SignKey, err = jwt.ParseRSAPrivateKeyFromPEM(signBytes)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -50,7 +42,7 @@ func InitAuth() {
 		log.Fatalf("Failed to read %s", os.Getenv("AUTH_JWT_PUBLIC_KEY_PATH"))
 	}
 
-	verifyKey, err = jwt.ParseRSAPublicKeyFromPEM(verifyBytes)
+	VerifyKey, err = jwt.ParseRSAPublicKeyFromPEM(verifyBytes)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
@@ -67,41 +59,5 @@ func (j *JwtWrapper) GenerateToken(userId uint8, email string) (signedToken stri
 		},
 	}
 
-	return token.SignedString(signKey)
-}
-
-type AuthHeader struct {
-	Header string `header:"Authorization"`
-}
-
-func AuthenticateUser() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		header := AuthHeader{}
-		if err := c.ShouldBindHeader(&header); err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"error": "Unauthorized",
-			})
-			c.Abort()
-
-			return
-		}
-
-		token, err := request.ParseFromRequestWithClaims(c.Request, request.OAuth2Extractor, &JwtClaim{}, func(t *jwt.Token) (interface{}, error) {
-			return verifyKey, nil
-		})
-
-		if err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"error": "Invalid Token",
-			})
-			c.Abort()
-
-			return
-		}
-
-		c.Set(UserId, token.Claims.(*JwtClaim).ID)
-		c.Set(UserEmail, token.Claims.(*JwtClaim).Email)
-
-		c.Next()
-	}
+	return token.SignedString(SignKey)
 }

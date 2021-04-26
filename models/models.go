@@ -2,7 +2,6 @@ package models
 
 import (
 	"car_scraper/database"
-
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -44,9 +43,24 @@ func (u UserRepository) GetUserById(id uint8) User {
 }
 
 type Filter struct {
-	ID     uint32 `gorm:"primaryKey:autoincrement;not null"`
+	ID     uint32 `gorm:"primaryKey;autoincrement;not null"`
 	UserID uint8  `gorm:"not null"`
 	User   User   `gorm:"foreignKey:UserID;not null"`
 	Type   string `gorm:"type:varchar(32);not null"`
 	Search string `gorm:"type:text;not null"`
+}
+
+type Car struct {
+	ID       uint64 `gorm:"primaryKey;autoincrement;not null"`
+	FilterID uint32 `gorm:"not null"`
+	Link     string `gorm:"type:varchar(150)"`
+	CarDTO   CarDTO
+}
+
+type CarDTO struct {
+	Title       string
+	Image       string
+	Description string
+	Price       string
+	TopOffer    bool
 }

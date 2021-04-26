@@ -1,6 +1,9 @@
 package server
 
 import (
+	"car_scraper/server/middleware"
+	"log"
+
 	"car_scraper/auth"
 	"car_scraper/database"
 	"car_scraper/models"
@@ -20,21 +23,24 @@ func StartServer() {
 
 	setupRoutes(app)
 
-	app.Run()
+	err := app.Run()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func setupRoutes(app *gin.Engine) {
 	filterRoutes := app.Group("/api/filters")
 	{
-		filterRoutes.GET("", auth.AuthenticateUser(), filterActions.GetCarFilters)
-		filterRoutes.POST("", auth.AuthenticateUser(), filterActions.CreateCarFilrer)
-		filterRoutes.DELETE("", auth.AuthenticateUser(), filterActions.DeleteCarFilter)
+		filterRoutes.GET("", middleware.AuthenticateUser(), filterActions.GetCarFilters)
+		filterRoutes.POST("", middleware.AuthenticateUser(), filterActions.CreateCarFilrer)
+		filterRoutes.DELETE("", middleware.AuthenticateUser(), filterActions.DeleteCarFilter)
 	}
 
-	autheRoutes := app.Group("/api/auth")
+	authRoutes := app.Group("/api/auth")
 	{
-		autheRoutes.POST("login", authActions.Login)
-		autheRoutes.GET("logout", authActions.Logout)
+		authRoutes.POST("login", authActions.Login)
+		authRoutes.GET("logout", authActions.Logout)
 	}
 
 	userRoutes := app.Group("/api/users")
