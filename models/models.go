@@ -47,7 +47,7 @@ type Filter struct {
 	UserID uint8  `gorm:"not null"`
 	User   User   `gorm:"foreignKey:UserID;not null"`
 	Type   string `gorm:"type:varchar(32);not null"`
-	Search string `gorm:"type:text;not null"`
+	Search string `gorm:"type:varchar(300);not null"`
 }
 
 type Car struct {

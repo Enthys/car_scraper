@@ -1,26 +1,23 @@
 package mobile_bg
 
 import (
-	"golang.org/x/text/encoding/charmap"
-	"io/ioutil"
-	"log"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
-func TestGettingSlink(t *testing.T) {
-	resp := getSlink(t)
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
+func TestGettingSearchResults(t *testing.T) {
+	pageContent := getSearchResults(PageSearchOptions{
+		VehicleType: "1",
+	})
+	t.Log(pageContent)
+	assert.Contains(t, pageContent, "<td class=\"valgtop algright\" style=\"width:106px;height:40px\">")
+}
 
-	out, _ := charmap.Windows1251.NewDecoder().String(string(body))
+func TestParsingSearchOptionsToURLString(t *testing.T) {
+	urlString := ParseSearchOptionsToValues(PageSearchOptions{
+		Brand: "3",
+		VehicleType: "33",
+	})
 
-	t.Logf("HEREERERERRER %s", out)
-
-	//for name, values := range resp.Header {
-	//	for _, value := range values {
-	//		t.Logf("%v = %v", name, value)
-	//	}
-	//}
+	assert.Equal(t, "act=3&f5=3&pubtype=33", urlString.Encode())
 }

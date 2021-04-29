@@ -1,14 +1,50 @@
 package mobile_bg
 
 import (
+	"golang.org/x/text/encoding/charmap"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
+	"reflect"
 	"strings"
-	"testing"
 )
 
-func getSlink(t *testing.T) *http.Response {
+type PageSearchOptions struct {
+	SearchPage  string `json:"f1"      mobile_bg:"f1"`
+	VehicleType string `json:"pubtype" mobile_bg:"pubtype"`
+	Brand       string `json:"f5"      mobile_bg:"f5"`
+	Model       string `json:"f6"      mobile_bg:"f6"`
+	YearStart   string `json:"f10"     mobile_bg:"f10"`
+	YearEnd     string `json:"f11"     mobile_bg:"f11"`
+	PriceStart  string `json:"f7"      mobile_bg:"f7"`
+	PriceEnd    string `json:"f8"      mobile_bg:"f8"`
+	Currency    string `json:"f9"      mobile_bg:"f9"`
+}
+
+func ParseSearchOptionsToValues(searchOptions PageSearchOptions) url.Values {
+	valueReflection := reflect.ValueOf(searchOptions)
+	typeReflection := reflect.TypeOf(searchOptions)
+	var values = url.Values{}
+	values.Add("act", "3")
+	for i := 0; i < typeReflection.NumField(); i++ {
+		searchField, found := typeReflection.Field(i).Tag.Lookup("mobile_bg")
+		if !found {
+			continue
+		}
+
+		searchValue := reflect.Indirect(valueReflection).Field(i).String()
+		if searchValue == "" {
+			continue
+		}
+
+		values.Add(searchField, searchValue)
+	}
+
+	return values
+}
+
+func getSearchResults(options PageSearchOptions) string {
 	myURL := "https://mobile.bg/pcgi/mobile.cgi"
 	nextURL := myURL
 	var i int
@@ -17,18 +53,19 @@ func getSlink(t *testing.T) *http.Response {
 		client := &http.Client{
 			CheckRedirect: func(req *http.Request, via []*http.Request) error {
 				return http.ErrUseLastResponse
-			} }
+			}}
 
 		resp, err := client.Post(
 			nextURL,
 			"application/x-www-form-urlencoded",
-			strings.NewReader(url.Values{"act": {"3"}, "rub": {"1"}, "pubtype": {"1"}}.Encode()),
+			strings.NewReader(ParseSearchOptionsToValues(options).Encode()),
 		)
+
 		if err != nil {
 			log.Fatal(err)
 		}
-		if resp.StatusCode == 200 {
-			t.Logf("200 OK: %v", resp)
+
+		if resp.StatusCode == http.StatusOK {
 			break
 		} else {
 			nextURL = resp.Header.Get("Location")
@@ -44,5 +81,15 @@ func getSlink(t *testing.T) *http.Response {
 		log.Fatal(err)
 	}
 
-	return resp
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	pageContent, err := charmap.Windows1251.NewDecoder().String(string(body))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return pageContent
 }

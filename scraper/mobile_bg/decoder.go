@@ -1,7 +1,9 @@
 package mobile_bg
 
 import (
+	"car_scraper/models"
 	"github.com/PuerkitoBio/goquery"
+	"strings"
 )
 
 func MobileBGGetOfferTitle(doc *goquery.Document) string {
@@ -45,4 +47,30 @@ func MobileBGGetOfferLink(doc *goquery.Document) string {
 		Attr("href")
 
 	return link
+}
+
+func MobileBGGetCarsFromPageResults(pageResults string) []models.CarDTO {
+	doc, _ := goquery.NewDocumentFromReader(strings.NewReader(pageResults))
+	var result []models.CarDTO
+	doc.Find("form[name=\"search\"]").
+		First().
+		Find("table").
+		Each(func(i int, carTable *goquery.Selection) {
+			carDoc := goquery.NewDocumentFromNode(carTable.Nodes[0])
+			title := MobileBGGetOfferTitle(carDoc)
+
+			if len(title) == 0 {
+				return
+			}
+
+			result = append(result, models.CarDTO{
+				Title:       MobileBGGetOfferTitle(carDoc),
+				Image:       MobileBGGetOfferImage(carDoc),
+				Description: MobileBGGetOfferDescription(carDoc),
+				Price:       MobileBGGetOfferPrice(carDoc),
+				TopOffer:    MobileBGIsTopOffer(carDoc),
+			})
+		})
+
+	return result
 }
