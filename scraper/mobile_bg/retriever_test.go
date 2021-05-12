@@ -6,11 +6,12 @@ import (
 )
 
 func TestGettingSearchResults(t *testing.T) {
-	pageContent := getSearchResults(PageSearchOptions{
+	pageContent, slink := getSearchResults(PageSearchOptions{
 		VehicleType: "1",
 	})
-	t.Log(pageContent)
+
 	assert.Contains(t, pageContent, "<td class=\"valgtop algright\" style=\"width:106px;height:40px\">")
+	assert.True(t, len(slink) > 0)
 }
 
 func TestParsingSearchOptionsToURLString(t *testing.T) {
@@ -20,4 +21,14 @@ func TestParsingSearchOptionsToURLString(t *testing.T) {
 	})
 
 	assert.Equal(t, "act=3&f5=3&pubtype=33", urlString.Encode())
+}
+
+func TestRetrievingResultsBySling(t *testing.T) {
+	_, slink := getSearchResults(PageSearchOptions{
+		VehicleType: "1",
+	})
+
+	pageResults := GetSearchBySlink(slink, 2)
+	assert.True(t, len(pageResults) > 400)
+	assert.Contains(t, pageResults, "<span class=\"pageNumbersSelect\">2</span>")
 }

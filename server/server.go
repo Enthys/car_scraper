@@ -1,16 +1,15 @@
 package server
 
 import (
+	"car_scraper/server/authentication"
+	"car_scraper/server/filter"
 	"car_scraper/server/middleware"
+	"car_scraper/server/user"
 	"log"
 
 	"car_scraper/auth"
 	"car_scraper/database"
 	"car_scraper/models"
-	authActions "car_scraper/server/authentication/routes"
-	filterActions "car_scraper/server/filter/routes"
-	userActions "car_scraper/server/user/routes"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -30,21 +29,21 @@ func StartServer() {
 }
 
 func setupRoutes(app *gin.Engine) {
-	filterRoutes := app.Group("/api/filters")
+	filterRoutes := app.Group("/filters")
 	{
-		filterRoutes.GET("", middleware.AuthenticateUser(), filterActions.GetCarFilters)
-		filterRoutes.POST("", middleware.AuthenticateUser(), filterActions.CreateCarFilrer)
-		filterRoutes.DELETE("", middleware.AuthenticateUser(), filterActions.DeleteCarFilter)
+		filterRoutes.GET("", middleware.AuthenticateUser(), filter.GetCarFilters)
+		filterRoutes.POST("", middleware.AuthenticateUser(), filter.CreateCarFilter)
+		filterRoutes.DELETE("", middleware.AuthenticateUser(), filter.DeleteCarFilter)
 	}
 
-	authRoutes := app.Group("/api/auth")
+	authRoutes := app.Group("/auth")
 	{
-		authRoutes.POST("login", authActions.Login)
-		authRoutes.GET("logout", authActions.Logout)
+		authRoutes.POST("login", authentication.Login)
+		authRoutes.GET("logout", authentication.Logout)
 	}
 
-	userRoutes := app.Group("/api/users")
+	userRoutes := app.Group("/users")
 	{
-		userRoutes.POST("", userActions.RegisterUser)
+		userRoutes.POST("", user.RegisterUser)
 	}
 }

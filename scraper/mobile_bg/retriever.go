@@ -1,12 +1,14 @@
 package mobile_bg
 
 import (
+	"fmt"
 	"golang.org/x/text/encoding/charmap"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
 	"reflect"
+	"regexp"
 	"strings"
 )
 
@@ -44,7 +46,7 @@ func ParseSearchOptionsToValues(searchOptions PageSearchOptions) url.Values {
 	return values
 }
 
-func getSearchResults(options PageSearchOptions) string {
+func getSearchResults(options PageSearchOptions) (string, string) {
 	myURL := "https://mobile.bg/pcgi/mobile.cgi"
 	nextURL := myURL
 	var i int
@@ -77,6 +79,30 @@ func getSearchResults(options PageSearchOptions) string {
 	}
 
 	resp, err := http.Get(nextURL)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	pageContent, err := charmap.Windows1251.NewDecoder().String(string(body))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	slinkMatches := regexp.MustCompile(".+slink=(.+)&")
+	slink := slinkMatches.FindAllStringSubmatch(nextURL, -1)[0][1]
+
+	return pageContent, slink
+}
+
+func GetSearchBySlink(slink string, page int) string {
+	myURL := fmt.Sprintf("https://mobile.bg/pcgi/mobile.cgi?act=3&slink=%s&f1=%v", slink, page)
+
+	resp, err := http.Get(myURL)
 	if err != nil {
 		log.Fatal(err)
 	}

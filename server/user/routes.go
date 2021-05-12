@@ -1,4 +1,4 @@
-package routes
+package user
 
 import (
 	"car_scraper/database"
@@ -13,7 +13,7 @@ import (
 type RegisterUserJSON struct {
 	Email           string `json:"email" binding:"required"`
 	Password        string `json:"password" binding:"required"`
-	PasswordConfirm string `json:"password_confirm" binding:"required"`
+	PasswordConfirm string `json:"passwordConfirm" binding:"required"`
 }
 
 func RegisterUser(c *gin.Context) {

@@ -8,6 +8,7 @@ import (
 func InitiateModels() {
 	database.DB.AutoMigrate(&User{})
 	database.DB.AutoMigrate(&Filter{})
+	database.DB.AutoMigrate(&Car{})
 }
 
 type User struct {
@@ -26,38 +27,23 @@ func (user *User) CheckPassword(password string) error {
 	return nil
 }
 
-type UserRepository struct{}
-
-func (u UserRepository) GetUserByEmail(email string) User {
-	var user User
-	database.DB.Model(&User{}).First(&user, "email = ?", email)
-
-	return user
-}
-
-func (u UserRepository) GetUserById(id uint8) User {
-	var user User
-	database.DB.Model(&User{}).First(&user, "id = ?", id)
-
-	return user
-}
-
 type Filter struct {
-	ID     uint32 `gorm:"primaryKey;autoincrement;not null"`
-	UserID uint8  `gorm:"not null"`
+	ID     uint32 `gorm:"primaryKey;autoincrement;not null" json:"id"`
+	UserID uint8  `gorm:"not null" json:"user_id"`
 	User   User   `gorm:"foreignKey:UserID;not null"`
-	Type   string `gorm:"type:varchar(32);not null"`
-	Search string `gorm:"type:varchar(300);not null"`
+	Type   string `gorm:"type:varchar(32);not null" json:"type"`
+	Search string `gorm:"type:varchar(300);not null" json:"search"`
 }
 
 type Car struct {
 	ID       uint64 `gorm:"primaryKey;autoincrement;not null"`
 	FilterID uint32 `gorm:"not null"`
+	Filter   Filter `gorm:"foreignKey:FilterID;not null"`
 	Link     string `gorm:"type:varchar(150)"`
-	CarDTO   CarDTO
 }
 
 type CarDTO struct {
+	ID          string
 	Title       string
 	Image       string
 	Description string

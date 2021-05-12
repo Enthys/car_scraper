@@ -67,6 +67,16 @@ func TestRetrievingLinkFromNormalOffer(t *testing.T) {
 	assert.Equal(t, "//www.mobile.bg/pcgi/mobile.cgi?act=4&adv=11619071592250455&slink=jumf9y", MobileBGGetOfferLink(doc))
 }
 
+func TestRetrievingIDFromTopOffer(t *testing.T) {
+	doc, _ := goquery.NewDocumentFromReader(strings.NewReader(topOfferPage))
+	assert.Equal(t, "21611567699623053", MobileBGGetOfferID(doc))
+}
+
+func TestRetrievingIDFromNormalOffer(t *testing.T) {
+	doc, _ := goquery.NewDocumentFromReader(strings.NewReader(normalOfferPage))
+	assert.Equal(t, "11619071592250455", MobileBGGetOfferID(doc))
+}
+
 func TestRetrievingCarDTOsFromSearchResults(t *testing.T) {
 	cars := MobileBGGetCarsFromPageResults(searchResults)
 	assert.True(t, len(cars) > 0)

@@ -3,6 +3,8 @@ package mobile_bg
 import (
 	"car_scraper/models"
 	"github.com/PuerkitoBio/goquery"
+	"log"
+	"net/url"
 	"strings"
 )
 
@@ -40,6 +42,20 @@ func MobileBGGetOfferImage(doc *goquery.Document) string {
 	return link
 }
 
+func MobileBGGetOfferID(doc *goquery.Document) string {
+	link, _ := doc.
+		Find("tbody tr td.algcent.valgmid a.photoLink").
+		First().
+		Attr("href")
+
+	linkUrl, err := url.Parse(link)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return linkUrl.Query().Get("adv")
+}
+
 func MobileBGGetOfferLink(doc *goquery.Document) string {
 	link, _ := doc.
 		Find("tbody tr td.algcent.valgmid a.photoLink").
@@ -49,9 +65,9 @@ func MobileBGGetOfferLink(doc *goquery.Document) string {
 	return link
 }
 
-func MobileBGGetCarsFromPageResults(pageResults string) []models.CarDTO {
+func MobileBGGetCarsFromPageResults(pageResults string) map[string]models.CarDTO {
 	doc, _ := goquery.NewDocumentFromReader(strings.NewReader(pageResults))
-	var result []models.CarDTO
+	var result map[string]models.CarDTO
 	doc.Find("form[name=\"search\"]").
 		First().
 		Find("table").
@@ -63,13 +79,15 @@ func MobileBGGetCarsFromPageResults(pageResults string) []models.CarDTO {
 				return
 			}
 
-			result = append(result, models.CarDTO{
+			carId := MobileBGGetOfferID(carDoc)
+			result[carId] = models.CarDTO{
+				ID:          MobileBGGetOfferID(carDoc),
 				Title:       MobileBGGetOfferTitle(carDoc),
 				Image:       MobileBGGetOfferImage(carDoc),
 				Description: MobileBGGetOfferDescription(carDoc),
 				Price:       MobileBGGetOfferPrice(carDoc),
 				TopOffer:    MobileBGIsTopOffer(carDoc),
-			})
+			}
 		})
 
 	return result

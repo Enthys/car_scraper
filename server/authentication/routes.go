@@ -1,4 +1,4 @@
-package routes
+package authentication
 
 import (
 	"car_scraper/auth"
@@ -19,7 +19,7 @@ func Login(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&requestData); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
+			"error": "Invalid arguments passed.",
 		})
 
 		return
@@ -36,9 +36,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	jwtWrapper := auth.JwtWrapper{
-		SecretKey: "This is a secret Key",
-	}
+	jwtWrapper := auth.JwtWrapper{}
 
 	token, err := jwtWrapper.GenerateToken(user.ID, user.Email)
 	if err != nil {
