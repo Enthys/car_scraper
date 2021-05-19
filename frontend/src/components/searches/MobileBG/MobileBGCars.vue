@@ -5,14 +5,17 @@
       v-on:brandInput="brand = arguments[0]"
       v-on:modelInput="model = arguments[0]"
     />
-
+    <br>
     <currency-range
       :min-value="0"
+      :max-value="1000"
       :currency-options="currencyOptions"
       v-on:currencyInput="currency = arguments[0]"
       v-on:minInput="priceStart = arguments[0]"
       v-on:maxInput="priceEnd = arguments[0]"
     />
+
+    <br>
 
     <range
       label="Year"
@@ -22,6 +25,7 @@
       v-on:maxInput="yearEnd = arguments[0]"
     />
 
+    <br>
     <button @click="createFilter">Create</button>
   </div>
 </template>
@@ -38,7 +42,7 @@ import { brandModels, currencyOptions } from './MobileBGCars.brands';
   components: { CurrencyRange, Range, BrandModel },
 })
 export default class MobileBGCars extends FilterBase {
-  protected type = 'MobileBGCars';
+  protected type = 'MobileBGCar';
 
   private readonly brandModels = brandModels;
 
@@ -62,7 +66,7 @@ export default class MobileBGCars extends FilterBase {
     return 'MobileBG Cars';
   }
 
-  private protected createFilter(): void {
+  protected createFilter(): void {
     this.$emit('createFilter', {
       type: this.type,
       data: {
@@ -70,10 +74,10 @@ export default class MobileBGCars extends FilterBase {
         act: '3',
         f5: this.brand,
         f6: this.model,
-        f10: this.yearStart,
-        f11: this.yearEnd,
-        f7: this.priceStart,
-        f8: this.priceEnd,
+        f10: String(this.yearStart),
+        f11: String(this.yearEnd),
+        f7: String(this.priceStart),
+        f8: String(this.priceEnd),
         f9: this.currency,
       },
     });

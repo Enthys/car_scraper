@@ -53,7 +53,7 @@ export default class CreateFilter extends Vue {
     return this.searches[this.index % this.searches.length];
   }
 
-  private async createFilter(filterData: { type: string, data: unknown }): void {
+  private async createFilter(filterData: { type: string, data: unknown }): Promise<void> {
     await this.filterService.createFilter(filterData.type, filterData.data);
   }
 

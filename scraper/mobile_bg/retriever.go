@@ -13,8 +13,8 @@ import (
 )
 
 type PageSearchOptions struct {
-	SearchPage  string `json:"f1"      mobile_bg:"f1"`
-	VehicleType string `json:"pubtype" mobile_bg:"pubtype"`
+	SearchPage  string `json:"f1,omitempty"      mobile_bg:"f1"`
+	VehicleType string `json:"pubtype,omitempty" mobile_bg:"pubtype"`
 	Brand       string `json:"f5"      mobile_bg:"f5"`
 	Model       string `json:"f6"      mobile_bg:"f6"`
 	YearStart   string `json:"f10"     mobile_bg:"f10"`

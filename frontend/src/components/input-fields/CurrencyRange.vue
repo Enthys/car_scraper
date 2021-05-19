@@ -2,8 +2,7 @@
   <div class="input">
     <div>
       Currency
-      <select @change="$emit('currencyInput', $event.target.value)">
-        <option value=""></option>
+      <select v-model="selectedCurrency" @change="$emit('currencyInput', $event.target.value)">
         <option v-for="(currency, index) in currencyOptions"
                 :key="index"
                 :value="currency">{{ currency }}</option>
@@ -37,6 +36,21 @@ import Range from './Range.vue';
 @Component
 export default class CurrencyRange extends Range {
   @Prop() private readonly currencyOptions!: string[];
+
+  private selectedCurrency = '';
+
+  protected mounted(): void {
+    this.min = this.minValue;
+    if (this.maxValue !== undefined) {
+      this.max = this.maxValue;
+    }
+
+    this.handleMinInput(this.min);
+    this.handleMaxInput(this.max);
+
+    [this.selectedCurrency] = this.currencyOptions;
+    this.$emit('currencyInput', this.selectedCurrency);
+  }
 }
 </script>
 

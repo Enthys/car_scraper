@@ -138,44 +138,43 @@ export const brandModels = {
 
 export const currencyOptions = ['лв.', 'USD', 'EUR'];
 
-export const requiredFields = {
-  topmenu: '1',
-  rub: '1',
-  act: '3',
-  rub_pub_save: '1',
-  f1: '1',
-  f2: '1',
-  f3: '1',
-  f4: '1',
-  f5: '', // Brand
-  f6: '', // Model
-  f7: '',
-  f8: '',
-  f9: '', // Currency
-  f10: '',
-  f11: '',
-  f12: '',
-  f13: '',
-  f14: '',
-  f15: '0',
-  f16: '',
-  f17: '',
-  f18: '',
-  f19: '0',
-  f20: '7', // Search Type set to newest from past two days
-  f21: '01', // Searching only for new and used cars
-  f24: '0',
-  f25: '',
-  f26: '',
-  f27: '',
-  f28: '',
-  f29: '',
-  f30: '',
-  f31: '',
-};
+// export const requiredFields = {
+//   topmenu: '1',
+//   rub: '1',
+//   act: '3',
+//   rub_pub_save: '1',
+//   f1: '1',
+//   f2: '1',
+//   f3: '1',
+//   f4: '1',
+//   f5: '', // Brand
+//   f6: '', // Model
+//   f7: '',
+//   f8: '',
+//   f9: '', // Currency
+//   f10: '',
+//   f11: '',
+//   f12: '',
+//   f13: '',
+//   f14: '',
+//   f15: '0',
+//   f16: '',
+//   f17: '',
+//   f18: '',
+//   f19: '0',
+//   f20: '7', // Search Type set to newest from past two days
+//   f21: '01', // Searching only for new and used cars
+//   f24: '0',
+//   f25: '',
+//   f26: '',
+//   f27: '',
+//   f28: '',
+//   f29: '',
+//   f30: '',
+//   f31: '',
+// };
 
 export default {
-  requiredFields,
   topmenu: [
     {
       hrefValue: 1,

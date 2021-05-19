@@ -35,22 +35,25 @@ export default class Range extends Vue {
 
   protected min = 0;
 
-  @Prop({ type: Number }) protected readonly maxValue?: number;
+  @Prop({ type: Number }) protected readonly maxValue!: number;
 
   protected max = 0;
 
   protected mounted(): void {
     this.min = this.minValue;
-    if (this.maxValue !== undefined) {
-      this.max = this.maxValue;
-    }
-    this.handleMinInput({ target: { value: this.min } });
-    this.handleMaxInput({ target: { value: this.max } });
+    this.max = this.maxValue;
+
+    this.handleMinInput(this.min);
+    this.handleMaxInput(this.max);
   }
 
-  protected handleMinInput(event: InputEvent): void {
-    this.min = Number((event.target as HTMLInputElement).value);
-    if (this.maxValue !== undefined && this.min > this.maxValue) {
+  protected handleMinInput(event: InputEvent | number): void {
+    if (typeof event === 'number') {
+      this.min = event;
+    } else {
+      this.min = Number((event.target as HTMLInputElement).value);
+    }
+    if (this.min > this.maxValue) {
       this.min = this.maxValue;
     }
 
@@ -58,13 +61,15 @@ export default class Range extends Vue {
       this.max = this.min;
     }
 
-    if (event.target) {
-      this.$emit('minInput', this.min);
-    }
+    this.$emit('minInput', this.min);
   }
 
-  protected handleMaxInput(event: InputEvent): void {
-    this.max = Number((event.target as HTMLInputElement).value);
+  protected handleMaxInput(event: InputEvent | number): void {
+    if (typeof event === 'number') {
+      this.max = event;
+    } else {
+      this.max = Number((event.target as HTMLInputElement).value);
+    }
 
     if (this.max < this.minValue) {
       this.max = this.minValue;
@@ -74,9 +79,7 @@ export default class Range extends Vue {
       this.max = this.min;
     }
 
-    if (event.target) {
-      this.$emit('maxInput', this.max);
-    }
+    this.$emit('maxInput', this.max);
   }
 }
 </script>

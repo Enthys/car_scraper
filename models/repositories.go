@@ -17,3 +17,11 @@ func (u UserRepository) GetUserById(id uint8) User {
 
 	return user
 }
+
+type FilterRepository struct {}
+
+func (r FilterRepository) SaveFilter(filter *Filter) error {
+	result := database.DB.Model(&Filter{}).Create(filter)
+
+	return result.Error
+}
