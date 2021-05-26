@@ -26,6 +26,12 @@ const routes: Array<RouteConfig> = [
     beforeEnter: HasLoggedInStatus(true, 'Login'),
   },
   {
+    path: '/filters',
+    name: 'Filters',
+    component: () => import('./../views/Filter/GetFilters.vue'),
+    beforeEnter: HasLoggedInStatus(true, 'Login'),
+  },
+  {
     path: '/login',
     name: 'Login',
     component: () => import('../views/Authentication/Login.vue'),

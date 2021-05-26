@@ -30,7 +30,7 @@
 </template>
 
 <script lang="ts">
-import MobileBGCars from '@/components/searches/MobileBG/MobileBGCars.vue';
+import MobileBGCars from '@/components/filters/MobileBG/MobileBGCars.vue';
 import FilterService from '@/services/FilterService/FilterService';
 import { VueConstructor } from 'vue';
 import { Component, Vue } from 'vue-property-decorator';

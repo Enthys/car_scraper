@@ -1,4 +1,4 @@
-package mobile_bg
+package scraper
 
 import (
 	"fmt"
@@ -12,7 +12,8 @@ import (
 	"strings"
 )
 
-type PageSearchOptions struct {
+type MobileBGPageSearchOptions struct {
+	PageSearchOptions
 	SearchPage  string `json:"f1,omitempty"      mobile_bg:"f1"`
 	VehicleType string `json:"pubtype,omitempty" mobile_bg:"pubtype"`
 	Brand       string `json:"f5"      mobile_bg:"f5"`
@@ -24,7 +25,26 @@ type PageSearchOptions struct {
 	Currency    string `json:"f9"      mobile_bg:"f9"`
 }
 
-func ParseSearchOptionsToValues(searchOptions PageSearchOptions) url.Values {
+type MobileBGRetriever struct {
+	Retriever
+}
+
+func (r MobileBGRetriever) GetCars(
+	search PageSearchOptions,
+	collection CarCollection,
+	page int,
+) CarCollection {
+	_, slink := r.GetSearchResults(search)
+	searchResult := r.getSearchBySlink(slink, page)
+
+	decoder := MobileBGDecoder{}
+	cars := decoder.GetCarsFromPageResults(searchResult)
+	collection.AddCars(cars)
+
+	return collection
+}
+
+func (r MobileBGRetriever) ParseSearchOptionsToValues(searchOptions PageSearchOptions) url.Values {
 	valueReflection := reflect.ValueOf(searchOptions)
 	typeReflection := reflect.TypeOf(searchOptions)
 	var values = url.Values{}
@@ -46,7 +66,7 @@ func ParseSearchOptionsToValues(searchOptions PageSearchOptions) url.Values {
 	return values
 }
 
-func getSearchResults(options PageSearchOptions) (string, string) {
+func (r MobileBGRetriever) GetSearchResults(options PageSearchOptions) (string, string) {
 	myURL := "https://mobile.bg/pcgi/mobile.cgi"
 	nextURL := myURL
 	var i int
@@ -60,7 +80,7 @@ func getSearchResults(options PageSearchOptions) (string, string) {
 		resp, err := client.Post(
 			nextURL,
 			"application/x-www-form-urlencoded",
-			strings.NewReader(ParseSearchOptionsToValues(options).Encode()),
+			strings.NewReader(r.ParseSearchOptionsToValues(options).Encode()),
 		)
 
 		if err != nil {
@@ -99,7 +119,7 @@ func getSearchResults(options PageSearchOptions) (string, string) {
 	return pageContent, slink
 }
 
-func GetSearchBySlink(slink string, page int) string {
+func (r MobileBGRetriever) getSearchBySlink(slink string, page int) string {
 	myURL := fmt.Sprintf("https://mobile.bg/pcgi/mobile.cgi?act=3&slink=%s&f1=%v", slink, page)
 
 	resp, err := http.Get(myURL)

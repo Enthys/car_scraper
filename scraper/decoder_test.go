@@ -1,4 +1,4 @@
-package mobile_bg
+package scraper
 
 import (
 	"github.com/PuerkitoBio/goquery"

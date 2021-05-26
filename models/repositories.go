@@ -13,7 +13,7 @@ func (u UserRepository) GetUserByEmail(email string) User {
 
 func (u UserRepository) GetUserById(id uint8) User {
 	var user User
-	database.DB.Model(&User{}).First(&user, "id = ?", id)
+	database.DB.Model(&User{}).Preload("Filters").First(&user, id)
 
 	return user
 }

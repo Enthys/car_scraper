@@ -17,7 +17,7 @@ func GetCarFilters(c *gin.Context) {
 		log.Fatal(err)
 	}
 	user := models.UserRepository{}.GetUserById(val.(uint8))
-
+	log.Printf("%v", user.Filters)
 	c.JSON(http.StatusOK, user.Filters)
 }
 
@@ -34,7 +34,7 @@ func CreateCarFilter(c *gin.Context) {
 		return
 	}
 	print(request.Filter)
-	scrapingService, err := scraper.GetScrapingService(request.Type)
+	scrapingService, err := scraper.GetScraper(request.Type)
 	if err != nil {
 		utils.BasicErrorHandle(c, err)
 		return

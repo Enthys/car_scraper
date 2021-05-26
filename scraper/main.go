@@ -2,10 +2,9 @@ package scraper
 
 import (
 	"car_scraper/models"
-	"car_scraper/scraper/mobile_bg"
-	"encoding/json"
 	"errors"
-	"log"
+	"github.com/PuerkitoBio/goquery"
+	"net/url"
 )
 
 const (
@@ -17,40 +16,29 @@ const (
 	FilterTypeCarsBgBus    = "CarsBGBus"
 )
 
-type Scraper interface {
-	CreateFilterFromString(filterArgs string) (*models.Filter, error)
-	InitiateFilter(filter *models.Filter) error
+type PageSearchOptions struct {
+	SearchPage  string
 }
 
-type MobileBGScraper struct {}
-
-func (s MobileBGScraper) CreateFilterFromString(filterArgs string) (*models.Filter, error) {
-	var filterSearchArgs mobile_bg.PageSearchOptions
-	err := json.Unmarshal([]byte(filterArgs), &filterSearchArgs)
-	if err != nil {
-		return nil, err
-	}
-
-	filterString, err := json.Marshal(filterSearchArgs)
-	if err != nil {
-		return nil, err
-	}
-
-	filter := models.Filter{
-		Type:   "MobileBGCar",
-		Search: string(filterString),
-	}
-
-	return &filter, nil
+type ICarCollection interface {
+	AddCars(cars map[string]models.CarDTO)
+	AddNewCars(seenCars, newCars map[string]models.CarDTO)
 }
 
-func (s MobileBGScraper) InitiateFilter(filter *models.Filter) error {
-	log.Printf("%v", filter)
-
-	return nil
+type CarCollection struct {
+	ICarCollection
+	cars            map[string]models.CarDTO
+	seenTopOfferCar bool
+	seenNormalCar   bool
 }
 
-func GetScrapingService(scraperType string) (Scraper, error) {
+type Retriever interface {
+	ParseSearchOptionsToValues(searchOptions PageSearchOptions) url.Values
+	GetSearchResults(options PageSearchOptions) (string, string)
+	GetCars(search PageSearchOptions, collection CarCollection, page int) CarCollection
+}
+
+func GetScraper(scraperType string) (Scraper, error) {
 	switch scraperType {
 	case FilterTypeMobileBgCar:
 		return MobileBGScraper{}, nil
@@ -58,3 +46,16 @@ func GetScrapingService(scraperType string) (Scraper, error) {
 		return nil, errors.New("invalid scraper type")
 	}
 }
+
+type Decoder interface {
+	GetOfferTitle(doc *goquery.Document) string
+	IsTopOffer(doc *goquery.Document) bool
+	GetOfferDescription(doc *goquery.Document) string
+	GetOfferPrice(doc *goquery.Document) string
+	GetOfferImage(doc *goquery.Document) string
+	GetOfferID(doc *goquery.Document) string
+	GetOfferLink(doc *goquery.Document) string
+	GetCarsFromPageResults(pageResults string) map[string]models.CarDTO
+}
+
+

@@ -34,7 +34,7 @@
 import BrandModel from '@/components/input-fields/BrandModel.vue';
 import CurrencyRange from '@/components/input-fields/CurrencyRange.vue';
 import Range from '@/components/input-fields/Range.vue';
-import FilterBase from '@/views/Filter/FilterBase';
+import FilterBase from '@/components/filters/FilterBase';
 import { Component } from 'vue-property-decorator';
 import { brandModels, currencyOptions } from './MobileBGCars.brands';
 

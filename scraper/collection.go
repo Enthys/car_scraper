@@ -1,18 +1,16 @@
-package mobile_bg
+package scraper
 
 import "car_scraper/models"
 
 const InitialCarLimit = 10
 
 type MobileBGCollection struct {
-	cars            map[string]models.CarDTO
-	topOfferCars    map[string]models.CarDTO
-	normalCars      map[string]models.CarDTO
-	seenTopOfferCar bool
-	seenNormalCar   bool
+	cars, topOfferCars, normalCars map[string]models.CarDTO
+	seenTopOfferCar                bool
+	seenNormalCar                  bool
 }
 
-func (col MobileBGCollection) addCars(cars []models.CarDTO) {
+func (col MobileBGCollection) AddCars(cars map[string]models.CarDTO) {
 	for _, car := range cars {
 		if car.TopOffer && len(col.topOfferCars) != InitialCarLimit {
 			col.topOfferCars[car.ID] = car
