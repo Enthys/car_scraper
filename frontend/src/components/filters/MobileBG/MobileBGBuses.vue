@@ -36,14 +36,14 @@ import CurrencyRange from '@/components/input-fields/CurrencyRange.vue';
 import Range from '@/components/input-fields/Range.vue';
 import FilterBase from '@/components/filters/FilterBase';
 import { Component } from 'vue-property-decorator';
-import brandModels from './MobileBGCars.brands';
+import brandModels from './MobileBGBuses.brands';
 import currencyOptions from './currencyOptions';
 
 @Component({
   components: { CurrencyRange, Range, BrandModel },
 })
-export default class MobileBGCars extends FilterBase {
-  protected type = 'MobileBGCar';
+export default class MobileBGBuses extends FilterBase {
+  protected type = 'MobileBGBus';
 
   private readonly brandModels = brandModels;
 
@@ -64,7 +64,7 @@ export default class MobileBGCars extends FilterBase {
   private priceEnd = 0;
 
   public static getTitle(): string {
-    return 'MobileBG Cars';
+    return 'MobileBG Buses';
   }
 
   protected createFilter(): void {

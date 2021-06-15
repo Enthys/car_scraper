@@ -1,4 +1,4 @@
-export const brandModels = {
+export default {
   AC: ['Други'],
   Acura: ['Integra', 'Mdx', 'NSX', 'Rdx', 'Rl', 'Rsx', 'Slx', 'Tl', 'Tsx'],
   Aixam: ['400', '505', '600'],
@@ -134,91 +134,4 @@ export const brandModels = {
   Победа: ['М'],
   София: ['С'],
   Чайка: ['М'],
-};
-
-export const currencyOptions = ['лв.', 'USD', 'EUR'];
-
-// export const requiredFields = {
-//   topmenu: '1',
-//   rub: '1',
-//   act: '3',
-//   rub_pub_save: '1',
-//   f1: '1',
-//   f2: '1',
-//   f3: '1',
-//   f4: '1',
-//   f5: '', // Brand
-//   f6: '', // Model
-//   f7: '',
-//   f8: '',
-//   f9: '', // Currency
-//   f10: '',
-//   f11: '',
-//   f12: '',
-//   f13: '',
-//   f14: '',
-//   f15: '0',
-//   f16: '',
-//   f17: '',
-//   f18: '',
-//   f19: '0',
-//   f20: '7', // Search Type set to newest from past two days
-//   f21: '01', // Searching only for new and used cars
-//   f24: '0',
-//   f25: '',
-//   f26: '',
-//   f27: '',
-//   f28: '',
-//   f29: '',
-//   f30: '',
-//   f31: '',
-// };
-
-export default {
-  topmenu: [
-    {
-      hrefValue: 1,
-      label: 'Cars and Jeeps',
-    },
-  ],
-  brandOptions: {
-    hrefValues: {
-      brand: 'f5',
-      model: 'f6',
-    },
-    brandsAndModels: brandModels,
-  },
-
-  price: {
-    scopeData: {
-      active: false,
-      label: 'Price',
-      hrefValues: {
-        min: 'f7',
-        max: 'f8',
-      },
-      extraData: {
-        max: 30000,
-      },
-    },
-    dropdownData: {
-      hrefValue: 'f9',
-      options: [
-        { value: 'лв.', label: 'лв.' },
-        { value: 'USD', label: 'USD' },
-        { value: 'EUR', label: 'EUR' },
-      ],
-      default: 'лв.',
-    },
-  },
-  betweens: [
-    {
-      active: false,
-      label: 'Year',
-      hrefValues: {
-        min: 'f10',
-        max: 'f11',
-      },
-    },
-  ],
 };

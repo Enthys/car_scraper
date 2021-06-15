@@ -4,6 +4,7 @@ import (
 	"car_scraper/models"
 	"errors"
 	"github.com/PuerkitoBio/goquery"
+	"github.com/elliotchance/orderedmap"
 	"net/url"
 )
 
@@ -16,32 +17,43 @@ const (
 	FilterTypeCarsBgBus    = "CarsBGBus"
 )
 
-type PageSearchOptions struct {
-	SearchPage  string
+type PageSearchOptions interface {
+	GetSearchType() string
 }
 
 type ICarCollection interface {
-	AddCars(cars map[string]models.CarDTO)
+	AddCars(cars *orderedmap.OrderedMap)
 	AddNewCars(seenCars, newCars map[string]models.CarDTO)
 }
 
 type CarCollection struct {
 	ICarCollection
-	cars            map[string]models.CarDTO
-	seenTopOfferCar bool
-	seenNormalCar   bool
+	Cars            map[string]models.CarDTO
+	SeenTopOfferCar bool
+	SeenNormalCar   bool
 }
 
 type Retriever interface {
 	ParseSearchOptionsToValues(searchOptions PageSearchOptions) url.Values
 	GetSearchResults(options PageSearchOptions) (string, string)
-	GetCars(search PageSearchOptions, collection CarCollection, page int) CarCollection
+	GetCars(search PageSearchOptions, collection ICarCollection, page int) ICarCollection
+	GetNewCars(search PageSearchOptions, page int) *orderedmap.OrderedMap
 }
 
 func GetScraper(scraperType string) (Scraper, error) {
 	switch scraperType {
 	case FilterTypeMobileBgCar:
 		return MobileBGScraper{}, nil
+	case FilterTypeMobileBgBike:
+		return MobileBGScraper{}, nil
+	case FilterTypeMobileBgBus:
+		return MobileBGScraper{}, nil
+	case FilterTypeCarsBgCar:
+		return CarsBGScraper{}, nil
+	case FilterTypeCarsBgBus:
+		return CarsBGScraper{}, nil
+	case FilterTypeCarsBgBike:
+		return CarsBGScraper{}, nil
 	default:
 		return nil, errors.New("invalid scraper type")
 	}

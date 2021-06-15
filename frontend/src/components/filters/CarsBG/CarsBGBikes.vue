@@ -1,7 +1,8 @@
 <template>
   <div class="search">
-    <brand-model
-      :brands-and-models="brandModels"
+    <carsbg-bike-brand-model
+      :brands="brands"
+      type="bike"
       v-on:brandInput="brand = arguments[0]"
       v-on:modelInput="model = arguments[0]"
     />
@@ -9,8 +10,6 @@
     <currency-range
       :min-value="0"
       :max-value="1000"
-      :currency-options="currencyOptions"
-      v-on:currencyInput="currency = arguments[0]"
       v-on:minInput="priceStart = arguments[0]"
       v-on:maxInput="priceEnd = arguments[0]"
     />
@@ -32,22 +31,25 @@
 
 <script lang="ts">
 import BrandModel from '@/components/input-fields/BrandModel.vue';
+import CarsBGBikeBrandModel from '@/components/input-fields/CarsBGBikeBrandModel.vue';
 import CurrencyRange from '@/components/input-fields/CurrencyRange.vue';
 import Range from '@/components/input-fields/Range.vue';
-import FilterBase from '@/components/filters/FilterBase';
 import { Component } from 'vue-property-decorator';
-import brandModels from './MobileBGCars.brands';
-import currencyOptions from './currencyOptions';
+import FilterBase from '../FilterBase';
+import brands from './CarsBGBikes.brands';
 
 @Component({
-  components: { CurrencyRange, Range, BrandModel },
+  components: {
+    'carsbg-bike-brand-model': CarsBGBikeBrandModel,
+    CurrencyRange,
+    Range,
+    BrandModel,
+  },
 })
-export default class MobileBGCars extends FilterBase {
-  protected type = 'MobileBGCar';
+export default class CarsBGBikes extends FilterBase {
+  protected type = 'CarsBGBike';
 
-  private readonly brandModels = brandModels;
-
-  private readonly currencyOptions = currencyOptions;
+  private readonly brands = brands;
 
   private brand = '';
 
@@ -57,29 +59,25 @@ export default class MobileBGCars extends FilterBase {
 
   private yearEnd = 2015;
 
-  private currency = 'USD';
-
   private priceStart = 0;
 
   private priceEnd = 0;
 
   public static getTitle(): string {
-    return 'MobileBG Cars';
+    return 'CarsBG Bikes';
   }
 
   protected createFilter(): void {
     this.$emit('createFilter', {
       type: this.type,
       data: {
-        topmenu: '1',
-        act: '3',
-        f5: this.brand,
-        f6: this.model,
-        f10: String(this.yearStart),
-        f11: String(this.yearEnd),
-        f7: String(this.priceStart),
-        f8: String(this.priceEnd),
-        f9: this.currency,
+        type: 'bike',
+        brandId: this.brand,
+        model: this.model,
+        yearStart: String(this.yearStart),
+        yearEnd: String(this.yearEnd),
+        priceStart: String(this.priceStart),
+        priceEnd: String(this.priceEnd),
       },
     });
   }

@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"car_scraper/database"
+	"car_scraper/models"
 	"fmt"
 	"os"
 
@@ -19,6 +21,9 @@ var rootCmd = &cobra.Command{
 }
 
 func Init() {
+	database.ConnectToDatabase()
+	models.InitiateModels()
+
 	rootCmd.AddCommand(StartScraperCommand)
 }
 

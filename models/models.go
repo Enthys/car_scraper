@@ -3,7 +3,6 @@ package models
 import (
 	"car_scraper/database"
 	"golang.org/x/crypto/bcrypt"
-	"time"
 )
 
 func InitiateModels() {
@@ -17,8 +16,8 @@ type User struct {
 	Email    string   `gorm:"type:varchar(124);not null"`
 	Password string   `gorm:"type:text;not null"`
 	Filters  []Filter `gorm:"constraint:OnDelete:CASCADE;"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	CreatedAt int
+	UpdatedAt int
 }
 
 func (user *User) CheckPassword(password string) error {
@@ -37,9 +36,18 @@ type Filter struct {
 	Type   string `gorm:"type:varchar(32);not null" json:"type"`
 	Search string `gorm:"type:varchar(300);not null" json:"search"`
 	Cars []Car `gorm:"constraint:OnDelete:CASCADE;"`
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	secretSecret string
+	CreatedAt int
+	UpdatedAt int
+}
+
+func (f *Filter) GetCarLinks() []string {
+	result := make([]string, 0)
+
+	for _, car := range f.Cars {
+		result = append(result, car.Link)
+	}
+
+	return result
 }
 
 type Car struct {
@@ -51,6 +59,7 @@ type Car struct {
 
 type CarDTO struct {
 	ID          string
+	Link		string
 	Title       string
 	Image       string
 	Description string

@@ -8,14 +8,10 @@ import (
 	"log"
 
 	"car_scraper/auth"
-	"car_scraper/database"
-	"car_scraper/models"
 	"github.com/gin-gonic/gin"
 )
 
 func StartServer() {
-	database.ConnectToDatabase()
-	models.InitiateModels()
 	auth.InitAuth()
 
 	app := gin.Default()
@@ -45,5 +41,10 @@ func setupRoutes(app *gin.Engine) {
 	userRoutes := app.Group("/users")
 	{
 		userRoutes.POST("", user.RegisterUser)
+	}
+
+	carsBGRoutes := app.Group("/carsbg")
+	{
+		carsBGRoutes.GET(":type/brands/:brandId/models", middleware.AuthenticateUser(), filter.GetCarsBGBrandModels)
 	}
 }

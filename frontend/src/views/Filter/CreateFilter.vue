@@ -30,7 +30,12 @@
 </template>
 
 <script lang="ts">
+import CarsBGBikes from '@/components/filters/CarsBG/CarsBGBikes.vue';
+import CarsBGBuses from '@/components/filters/CarsBG/CarsBGBuses.vue';
+import CarsBGCars from '@/components/filters/CarsBG/CarsBGCars.vue';
+import MobileBGBikes from '@/components/filters/MobileBG/MobileBGBikes.vue';
 import MobileBGCars from '@/components/filters/MobileBG/MobileBGCars.vue';
+import MobileBGBuses from '@/components/filters/MobileBG/MobileBGBuses.vue';
 import FilterService from '@/services/FilterService/FilterService';
 import { VueConstructor } from 'vue';
 import { Component, Vue } from 'vue-property-decorator';
@@ -43,7 +48,9 @@ export default class CreateFilter extends Vue {
 
   private index = 0;
 
-  private searches: VueConstructor[] = [MobileBGCars];
+  private searches: VueConstructor[] = [
+    MobileBGCars, MobileBGBuses, MobileBGBikes, CarsBGCars, CarsBGBuses, CarsBGBikes,
+  ];
 
   private message = '';
 
@@ -54,7 +61,14 @@ export default class CreateFilter extends Vue {
   }
 
   private async createFilter(filterData: { type: string, data: unknown }): Promise<void> {
-    await this.filterService.createFilter(filterData.type, filterData.data);
+    try {
+      await this.filterService.createFilter(filterData.type, filterData.data);
+      this.error = '';
+      this.message = 'Filter Created!';
+    } catch (err) {
+      this.error = `Failed to create filter! Error: ${err.message}`;
+      this.message = '';
+    }
   }
 
   private clearMessage(): void {

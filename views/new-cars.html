@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <style>
+        .car {
+            border: 1px solid black;
+            margin: 10px 0px;
+            padding: 0px 5px;
+
+            display: block;
+            min-width: 550px;
+            width: auto;
+            max-width: 700px;
+            min-height: 250px;
+            height: auto;
+        }
+
+        .car .image {
+            display: inline-block;
+            width: 40%;
+            margin: auto 5px;
+        }
+
+        .car-image {
+            display: inline-block;
+            width: 100%;
+            height: 180px;
+            background-size: 100%;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .car .desc {
+            float: right;
+            padding: 10px;
+            width: 50%;
+            border-left: 1px solid black;
+            font-family: Arial, Helvetica, sans-serif;
+            min-height: 140px;
+            height: auto;
+        }
+
+        .car-title {
+            width: 100%;
+            font-size: 26px;
+            border-bottom: 1px solid black;
+        }
+
+        .car-desc {
+            height: auto;
+        }
+
+        .car-title a, .car-title a:active {
+            color: black;
+            text-decoration: none;
+        }
+
+        .car-price {
+            font-size: 18px;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+<table class="car-collection">
+    <h2>New Cars</h2>
+    {{range .Cars }}
+    <tr class="car">
+        <td class="image">
+            <a href="{{ .Link }}">
+                <div class="car-image" style="background-image: url('{{ .Image }}')"></div>
+            </a>
+        </td>
+        <td class="desc">
+            <div class="car-title">
+                <a href="{{ .Link }}">{{ .Title }}</a>
+            </div>
+            <div class="car-desc">
+                {{ .Description }}
+            </div>
+            <div class="car-price">
+                {{ .Price }}
+            </div>
+        </td>
+    </tr>
+    {{end}}
+</table>
+</body>
+</html>
