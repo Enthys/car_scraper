@@ -120,7 +120,6 @@ func (m MobileBGScraper) GetNewCars(filter *models.Filter) *orderedmap.OrderedMa
 
 	page := 1
 	for {
-		println("Checking page: ", page)
 		cars := retriever.GetNewCars(&mobileBGSearchParams, page)
 
 		for _, key := range cars.Keys() {
@@ -151,7 +150,6 @@ func (m MobileBGScraper) GetNewCars(filter *models.Filter) *orderedmap.OrderedMa
 			break
 		}
 
-		log.Printf("New Cars %v", len(newCars.Keys()))
 		page += 1
 	}
 
@@ -170,7 +168,6 @@ func (r mobileBGRetriever) GetCars(
 	decoder := mobileBGDecoder{}
 	slink := ""
 	for {
-		println(page, len(collection.(mobileBGCollection).topOfferCars), len(collection.(mobileBGCollection).normalCars))
 		if len(collection.(mobileBGCollection).topOfferCars) == InitialCarLimit / 2 && len(collection.(mobileBGCollection).normalCars) == InitialCarLimit / 2 {
 			break
 		}
@@ -180,6 +177,9 @@ func (r mobileBGRetriever) GetCars(
 		}
 		searchResult := r.getSearchBySlink(slink, page)
 		cars := decoder.GetCarsFromPageResults(searchResult)
+		if cars.Len() == 0 {
+			break
+		}
 		collection.AddCars(cars)
 		page += 1
 	}
@@ -195,7 +195,7 @@ func (r mobileBGRetriever) GetNewCars(
 		_, slink := r.GetSearchResults(*search)
 		search.SetSlink(slink)
 	}
-	println("Slink", search.Slink)
+
 	searchResult := r.getSearchBySlink(search.Slink, page)
 
 	decoder := mobileBGDecoder{}
@@ -278,11 +278,18 @@ func (r mobileBGRetriever) GetSearchResults(options PageSearchOptions) (string, 
 }
 
 func (r mobileBGRetriever) getSearchBySlink(slink string, page int) string {
-	myURL := fmt.Sprintf("https://mobile.bg/pcgi/mobile.cgi?act=3&slink=%s&f1=%v", slink, page)
+	requestUrl := fmt.Sprintf("https://mobile.bg/pcgi/mobile.cgi?act=3&slink=%s&f1=%v", slink, page)
 
-	resp, err := http.Get(myURL)
+	resp, err := http.Get(requestUrl)
 	if err != nil {
-		log.Fatal(err)
+		counter := 0
+		for counter < 5 || err != nil {
+			resp, err = http.Get(requestUrl)
+			counter += 1
+		}
+		if counter == 5 && err != nil {
+			log.Fatal("Failed to retrieve MobileBG Search results")
+		}
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)

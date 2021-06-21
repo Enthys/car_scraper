@@ -12,6 +12,7 @@ import (
 	"net/smtp"
 	"os"
 	"strconv"
+	"sync"
 )
 
 var StartScraperCommand = &cobra.Command{
@@ -32,17 +33,26 @@ func runUserFilters(user *models.User) {
 	}
 	wp := workerpool.New(int(workerCount))
 
-	newCars := make([]models.CarDTO, 0)
+	newCarHolder := sync.Map{}
 	for _, filter := range user.Filters {
 		filterID := filter.ID
 
 		wp.Submit(func() {
 			cars, _ := runFilter(&filterID)
-			newCars = append(newCars, cars...)
+			for _, car := range cars {
+				newCarHolder.Store(car.Link, car)
+			}
 		})
 	}
 
 	wp.StopWait()
+	newCars := make([]models.CarDTO, 0)
+	newCarHolder.Range(func(key, value interface{}) bool {
+		newCars = append(newCars, value.(models.CarDTO))
+
+		return true
+	})
+
 	if len(newCars) != 0 {
 		sendEmailsForNewCars(newCars, "bloodlisterer@gmail.com")
 	}
@@ -79,7 +89,6 @@ func runFilter(filterID *uint32) ([]models.CarDTO, error) {
 
 	for _, key := range newCars.Keys() {
 		val, _ := newCars.Get(key)
-		println("IMAGE", val.(models.CarDTO).Image)
 		result = append(result, val.(models.CarDTO))
 	}
 
@@ -91,6 +100,9 @@ func sendEmailsForNewCars(cars []models.CarDTO, receiverEmail string) {
 	pass := os.Getenv("MAIL_SENDER_PASSWORD")
 	mailAddr := os.Getenv("MAIL_SENDER_ADDRESS")
 	mailHost := os.Getenv("MAIL_SENDER_HOST")
+
+	println("Sending email with ", from, pass, mailHost, mailAddr)
+
 	gmailAuth := smtp.PlainAuth("", from, pass, mailHost)
 
 	tmpl, err := template.ParseFiles("views/new-cars.html")
@@ -108,5 +120,8 @@ func sendEmailsForNewCars(cars []models.CarDTO, receiverEmail string) {
 		Cars: cars,
 	})
 
-	smtp.SendMail(mailAddr, gmailAuth, from, []string{receiverEmail}, body.Bytes())
+	err = smtp.SendMail(mailAddr, gmailAuth, from, []string{receiverEmail}, body.Bytes())
+	if err != nil {
+		log.Fatal(err)
+	}
 }

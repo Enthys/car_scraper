@@ -34,8 +34,8 @@ type Filter struct {
 	UserID uint8
 	User   User
 	Type   string `gorm:"type:varchar(32);not null" json:"type"`
-	Search string `gorm:"type:varchar(300);not null" json:"search"`
-	Cars []Car `gorm:"constraint:OnDelete:CASCADE;"`
+	Search string `gorm:"type:varchar(450);not null" json:"search"`
+	Cars []Car
 	CreatedAt int
 	UpdatedAt int
 }
@@ -53,7 +53,7 @@ func (f *Filter) GetCarLinks() []string {
 type Car struct {
 	ID       uint64 `gorm:"primaryKey;autoincrement;not null"`
 	FilterID uint32 `gorm:"not null"`
-	Filter   Filter `gorm:"foreignKey:FilterID;not null"`
+	Filter   Filter `gorm:"foreignKey:FilterID;not null;constraints:OnDelete:CASCADE"`
 	Link     string `gorm:"type:varchar(150)"`
 }
 

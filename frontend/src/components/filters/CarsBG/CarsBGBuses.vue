@@ -4,7 +4,7 @@
       :brands="brands"
       type="bus"
       v-on:brandInput="brand = arguments[0]"
-      v-on:modelInput="model = arguments[0]"
+      v-on:modelInput="models = arguments[0]"
     />
     <br>
     <currency-range
@@ -53,7 +53,7 @@ export default class CarsBGBuses extends FilterBase {
 
   private brand = '';
 
-  private model = '';
+  private models: string[] = [];
 
   private yearStart = 1980;
 
@@ -73,7 +73,7 @@ export default class CarsBGBuses extends FilterBase {
       data: {
         type: 'bus',
         brandId: this.brand,
-        model: this.model,
+        models: this.models,
         yearStart: String(this.yearStart),
         yearEnd: String(this.yearEnd),
         priceStart: String(this.priceStart),

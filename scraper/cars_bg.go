@@ -17,15 +17,15 @@ import (
 
 type CarsBGPageSearchOptions struct {
 	PageSearchOptions
-	Type       string `json:"type"`
-	TypeOffer  string `cars_bg:"typeOffer"`
-	Page       string `json:"page,omitempty" cars_bg:"page"`
-	Brand      string `json:"brandId"        cars_bg:"brandId"`
-	Model      string `json:"model"          cars_bg:"models[]"`
-	YearStart  string `json:"yearFrom"       cars_bg:"yearFrom"`
-	YearEnd    string `json:"yearTo"         cars_bg:"yearTo"`
-	PriceStart string `json:"priceFrom"      cars_bg:"priceFrom"`
-	PriceEnd   string `json:"priceTo"        cars_bg:"priceTo"`
+	Type       string   `json:"type"`
+	TypeOffer  string   `cars_bg:"typeOffer"`
+	Page       string   `json:"page,omitempty" cars_bg:"page"`
+	Brand      string   `json:"brandId"        cars_bg:"brandId"`
+	Models     []string `json:"models"          cars_bg:"models[]"`
+	YearStart  string   `json:"yearFrom"       cars_bg:"yearFrom"`
+	YearEnd    string   `json:"yearTo"         cars_bg:"yearTo"`
+	PriceStart string   `json:"priceFrom"      cars_bg:"priceFrom"`
+	PriceEnd   string   `json:"priceTo"        cars_bg:"priceTo"`
 }
 
 func (c CarsBGPageSearchOptions) GetSearchType() string {
@@ -38,7 +38,7 @@ type CarsBGBikePageSearchOptions struct {
 	TypeOffer  string `cars_bg:"typeOffer"`
 	Page       string `json:"page,omitempty" cars_bg:"page"`
 	Brand      string `json:"brandId"        cars_bg:"brandId"`
-	Model      string `json:"model"          cars_bg:"model_moto"`
+	Models     string `json:"models"          cars_bg:"model_moto"`
 	YearStart  string `json:"yearFrom"       cars_bg:"yearFrom"`
 	YearEnd    string `json:"yearTo"         cars_bg:"yearTo"`
 	PriceStart string `json:"priceFrom"      cars_bg:"priceFrom"`
@@ -107,16 +107,12 @@ func getSearchOptions(searchParams PageSearchOptions) PageSearchOptions {
 func (c CarsBGScraper) GetNewCars(filter *models.Filter) *orderedmap.OrderedMap {
 	oldCarLinks := filter.GetCarLinks()
 
-	for i, link := range oldCarLinks {
-		println(i, link)
-	}
-
 	searchParams, err := GetSearchParams(filter)
 
 	if err != nil {
 		panic(err)
 	}
-	
+
 	carsBGSearchParams := getSearchOptions(searchParams)
 	retriever := carsBGRetriever{}
 	newCars := orderedmap.NewOrderedMap()
@@ -124,15 +120,11 @@ func (c CarsBGScraper) GetNewCars(filter *models.Filter) *orderedmap.OrderedMap 
 	page := 1
 	seenOldCar := false
 	for !seenOldCar {
-		println("Checking page: ", page)
 		cars := retriever.GetNewCars(carsBGSearchParams, page)
 
 		for _, key := range cars.Keys() {
 			carVal, _ := cars.Get(key)
 			car := carVal.(models.CarDTO)
-
-			println(car.Link)
-
 			if InSliceString(oldCarLinks, car.Link) {
 				seenOldCar = true
 				break
@@ -145,7 +137,6 @@ func (c CarsBGScraper) GetNewCars(filter *models.Filter) *orderedmap.OrderedMap 
 			break
 		}
 
-		log.Printf("New Cars %v", len(newCars.Keys()))
 		page += 1
 	}
 
@@ -205,7 +196,7 @@ func getOptionsType(options PageSearchOptions) string {
 		return options.(CarsBGBikePageSearchOptions).Type
 	}
 
-	panic("Invalid options");
+	panic("Invalid options")
 }
 
 func (c carsBGRetriever) GetSearchResults(options PageSearchOptions) (string, string) {
@@ -234,18 +225,34 @@ func (c carsBGRetriever) GetSearchResults(options PageSearchOptions) (string, st
 	query := req.URL.Query()
 	queryValues := c.ParseSearchOptionsToValues(options)
 	for key, keyValues := range queryValues {
+		if key == "models[]" {
+			continue
+		}
+
 		for _, value := range keyValues {
 			query.Set(key, value)
 		}
 	}
 
-	req.URL.RawQuery = query.Encode()
+	if options.GetSearchType() != FilterTypeCarsBgBike {
+		so := options.(CarsBGPageSearchOptions)
+		for _, model := range so.Models {
+			query.Add("models[]", model)
+		}
+	}
 
-	println(req.URL.String())
+	req.URL.RawQuery = query.Encode()
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Fatal(err)
+		counter := 0
+		for counter < 5 || err != nil {
+			resp, err = client.Do(req)
+			counter += 1
+		}
+		if counter == 5 && err != nil {
+			log.Fatal("Failed to retrieve MobileBG Search results")
+		}
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)

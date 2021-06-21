@@ -22,13 +22,13 @@ const routes: Array<RouteConfig> = [
   {
     path: '/',
     name: 'Home',
-    component: () => import('./../views/Filter/CreateFilter.vue'),
+    component: () => import('../views/Filter/CreateFilter.vue'),
     beforeEnter: HasLoggedInStatus(true, 'Login'),
   },
   {
     path: '/filters',
     name: 'Filters',
-    component: () => import('./../views/Filter/GetFilters.vue'),
+    component: () => import('../views/Filter/GetFilters.vue'),
     beforeEnter: HasLoggedInStatus(true, 'Login'),
   },
   {

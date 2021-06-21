@@ -50,6 +50,12 @@ func (r *FilterRepository) GetFilterByID(id uint32) Filter {
 	return filter
 }
 
+func (r *FilterRepository) DeleteFilter(f *Filter) error {
+	result := database.DB.Model(f).Delete(f)
+
+	return result.Error
+}
+
 type CarRepository struct {}
 
 func (r CarRepository) SaveCar(car *Car) error {

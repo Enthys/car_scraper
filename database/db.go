@@ -24,7 +24,6 @@ func ConnectToDatabase() {
 	}
 
 	DB = db
-	log.Println("Connected to database!")
 }
 
 type ConnectionAttempt struct {

@@ -4,6 +4,7 @@ go 1.13
 
 require (
 	github.com/PuerkitoBio/goquery v1.6.1 // indirect
+	github.com/cheggaaa/pb/v3 v3.0.8 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/elliotchance/orderedmap v1.4.0 // indirect
 	github.com/gammazero/workerpool v1.1.2 // indirect
