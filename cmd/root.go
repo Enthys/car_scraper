@@ -3,14 +3,10 @@ package cmd
 import (
 	"car_scraper/database"
 	"car_scraper/models"
-	"fmt"
-	"github.com/joho/godotenv"
-	"log"
-	"os"
-	"path/filepath"
-	"runtime"
-
 	"car_scraper/server"
+	"fmt"
+	"github.com/gin-gonic/gin"
+	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -20,17 +16,12 @@ var rootCmd = &cobra.Command{
 	Short: "Start the webserver",
 	Long:  "Start the webserver using the provided configuration",
 	Run: func(cmd *cobra.Command, args []string) {
+		gin.SetMode(os.Getenv("GIN_MODE"))
 		server.StartServer()
 	},
 }
 
 func Init() {
-	_, b, _, _ := runtime.Caller(0)
-	err := godotenv.Overload(filepath.Join(filepath.Dir(b), "../.env"))
-	if err != nil {
-		log.Fatalln(err)
-	}
-
 	database.ConnectToDatabase()
 	models.InitiateModels()
 

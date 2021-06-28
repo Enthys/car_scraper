@@ -5,11 +5,17 @@ import (
 	"github.com/joho/godotenv"
 	"log"
 	"os"
+	"path/filepath"
 )
 
 func main() {
-	if pathExists(".env") {
-		err := godotenv.Load()
+	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if pathExists(dir + "/.env") {
+		err = godotenv.Overload(dir + "/.env")
 		if err != nil {
 			log.Fatal("Error loading .env file")
 			return

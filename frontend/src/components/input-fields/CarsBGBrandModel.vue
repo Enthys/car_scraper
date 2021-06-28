@@ -61,7 +61,7 @@ export default class CarsBGBrandModel extends Vue {
     } else {
       this.selectedModels.splice(this.selectedModels.indexOf(value), 1);
     }
-    this.$emit('modelInput', [this.selectedModels]);
+    this.$emit('modelInput', this.selectedModels);
   }
 
   private async setBrandModels(): Promise<void> {

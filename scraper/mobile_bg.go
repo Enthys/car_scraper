@@ -175,7 +175,10 @@ func (r mobileBGRetriever) GetCars(
 		if slink == "" {
 			_, slink = r.GetSearchResults(search)
 		}
+
+		println("AAAAAAAAAa");
 		searchResult := r.getSearchBySlink(slink, page)
+		println("BBBBBB");
 		cars := decoder.GetCarsFromPageResults(searchResult)
 		if cars.Len() == 0 {
 			break
@@ -234,6 +237,7 @@ func (r mobileBGRetriever) GetSearchResults(options PageSearchOptions) (string, 
 			CheckRedirect: func(req *http.Request, via []*http.Request) error {
 				return http.ErrUseLastResponse
 			}}
+		println("OH COME ON", nextURL)
 
 		resp, err := client.Post(
 			nextURL,
@@ -242,7 +246,7 @@ func (r mobileBGRetriever) GetSearchResults(options PageSearchOptions) (string, 
 		)
 
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal(err, nextURL)
 		}
 
 		if resp.StatusCode == http.StatusOK {
