@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -74,9 +75,19 @@ func CreateCarFilter(c *gin.Context) {
 }
 
 func DeleteCarFilter(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"message": "GetCarFilters",
-	})
+	filterId, err := strconv.ParseInt(c.Param("filterId"), 10,64)
+	if err != nil {
+		panic("Invalid filterId provided: " + c.Param("filterId"))
+	}
+
+	filterRepo := models.FilterRepository{}
+	filter := filterRepo.GetFilterByID(uint32(filterId))
+	err = filterRepo.DeleteFilter(&filter)
+	if err != nil {
+		panic(err)
+	}
+
+	c.Status(http.StatusNoContent)
 }
 
 func GetCarsBGBrandModels(c *gin.Context) {

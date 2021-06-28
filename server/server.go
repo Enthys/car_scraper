@@ -29,7 +29,7 @@ func setupRoutes(app *gin.Engine) {
 	{
 		filterRoutes.GET("", middleware.AuthenticateUser(), filter.GetCarFilters)
 		filterRoutes.POST("", middleware.AuthenticateUser(), filter.CreateCarFilter)
-		filterRoutes.DELETE("", middleware.AuthenticateUser(), filter.DeleteCarFilter)
+		filterRoutes.DELETE(":filterId", middleware.AuthenticateUser(), filter.DeleteCarFilter)
 	}
 
 	authRoutes := app.Group("/auth")

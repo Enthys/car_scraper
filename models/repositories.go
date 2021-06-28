@@ -2,6 +2,7 @@ package models
 
 import (
 	"car_scraper/database"
+	"fmt"
 )
 
 type UserRepository struct{}
@@ -51,15 +52,41 @@ func (r *FilterRepository) GetFilterByID(id uint32) Filter {
 }
 
 func (r *FilterRepository) DeleteFilter(f *Filter) error {
+	fmt.Printf("%+v", f)
 	result := database.DB.Model(f).Delete(f)
 
 	return result.Error
+}
+
+func (r *FilterRepository) DeleteOldCars(c *CarRepository, f *Filter) error {
+	if len(f.Cars) < 50 {
+		return nil
+	}
+
+	shouldDelete := false
+
+	for _, car := range f.Cars {
+		if shouldDelete {
+			if err := c.DeleteCar(&car); err != nil {
+				println("Failed to delete car: ", car.ID)
+			}
+		}
+		shouldDelete = !shouldDelete
+	}
+
+	return nil
 }
 
 type CarRepository struct {}
 
 func (r CarRepository) SaveCar(car *Car) error {
 	result := database.DB.Model(&Car{}).Create(&car)
+
+	return result.Error
+}
+
+func (r CarRepository) DeleteCar(c *Car) error {
+	result := database.DB.Model(c).Delete(c)
 
 	return result.Error
 }

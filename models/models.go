@@ -12,12 +12,12 @@ func InitiateModels() {
 }
 
 type User struct {
-	ID       uint8    `gorm:"primaryKey;autoincrement;not null"`
-	Email    string   `gorm:"type:varchar(124);not null"`
-	Password string   `gorm:"type:text;not null"`
-	Filters  []Filter `gorm:"constraint:OnDelete:CASCADE;"`
-	CreatedAt int
-	UpdatedAt int
+	ID       uint8    `gorm:"primaryKey;autoincrement;not null" json:"id"`
+	Email    string   `gorm:"type:varchar(124);not null" json:"email"`
+	Password string   `gorm:"type:text;not null" json:"-"`
+	Filters  []Filter `gorm:"constraint:OnDelete:CASCADE;" json:"filters"`
+	CreatedAt int `json:"created_at"`
+	UpdatedAt int `json:"-"`
 }
 
 func (user *User) CheckPassword(password string) error {
@@ -31,13 +31,13 @@ func (user *User) CheckPassword(password string) error {
 
 type Filter struct {
 	ID     uint32 `gorm:"primaryKey;autoincrement;not null" json:"id"`
-	UserID uint8
-	User   User
+	UserID uint8 `json:"user_id"`
+	User   User `json:"user"`
 	Type   string `gorm:"type:varchar(32);not null" json:"type"`
 	Search string `gorm:"type:varchar(450);not null" json:"search"`
-	Cars []Car
-	CreatedAt int
-	UpdatedAt int
+	Cars []Car `json:"cars"`
+	CreatedAt int `json:"created_at"`
+	UpdatedAt int `json:"-"`
 }
 
 func (f *Filter) GetCarLinks() []string {

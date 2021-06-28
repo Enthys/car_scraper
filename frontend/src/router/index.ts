@@ -28,7 +28,7 @@ const routes: Array<RouteConfig> = [
   {
     path: '/filters',
     name: 'Filters',
-    component: () => import('../views/Filter/GetFilters.vue'),
+    component: () => import('../views/Filter/ShowFilters.vue'),
     beforeEnter: HasLoggedInStatus(true, 'Login'),
   },
   {

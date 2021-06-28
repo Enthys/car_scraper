@@ -13,6 +13,18 @@ export enum FilterType {
 export interface FilterInterface {
   id: number
   type: FilterType
+  search: string
+}
+
+export interface FilterSearchInterface {
+  id: number,
+  type: FilterType,
+  brand?: string,
+  model?: string|string[]
+  yearFrom?: string
+  yearTo?: string
+  priceFrom?: string
+  priceTo?: string
 }
 
 export default class FilterService {
@@ -33,5 +45,9 @@ export default class FilterService {
       type,
       filter: JSON.stringify(filter),
     });
+  }
+
+  async deleteFilter(filterId: number): Promise<void> {
+    await this.axios.delete(`/filters/${filterId}`);
   }
 }
