@@ -54,7 +54,7 @@ func runUserFilters(user *models.User) {
 	})
 
 	if len(newCars) != 0 {
-		sendEmailsForNewCars(newCars, "bloodlisterer@gmail.com")
+		sendEmailsForNewCars(newCars, user.Email)
 	}
 }
 
