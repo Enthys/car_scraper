@@ -111,7 +111,7 @@ func sendEmailsForNewCars(cars []models.CarDTO, receiverEmail string) {
 	}
 
 	var body bytes.Buffer
-	headers := "Content-Type: text/html; charset=ISO-8859-1"
+	headers := "Content-Type: text/html; charset=\"ISO-8859-1\""
 	body.Write([]byte(fmt.Sprintf("Subject: New Cars\n%s\n\n", headers)))
 
 	tmpl.Execute(&body, struct {
